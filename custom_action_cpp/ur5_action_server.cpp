@@ -23,8 +23,11 @@ namespace custom_action_cpp
             using namespace std::placeholders;
 
             auto handle_goal = [this](const rclcpp_action::GoalUUID & uuid, std::shared_ptr<const UR5::Goal> goal){
+                std::vector<double> joints = goal->joints;
 
-                RCLCPP_INFO(this->get_logger(), "Received goal request with movement instuctions of %f %f %f %f %f %f", goal->shoulder_pan_joint, goal->shoulder_lift_joint, goal->elbow_joint, goal->wrist_1_joint, goal->wrist_2_joint, goal->wrist_3_joint);
+                for(int i = 0; i < joints.size(); i++){
+                    RCLCPP_INFO(this->get_logger(), "Received goal request with movement instuction %d of %f", i, joints[i]);
+                }
                 (void)uuid;
                 return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
             };
@@ -56,7 +59,11 @@ namespace custom_action_cpp
             rclcpp_action::Server<UR5>::SharedPtr action_server_;
 
             void execute(const std::shared_ptr<GoalHandleUR5> goal_handle){
-                
+                RCLCPP_INFO(this->get_logger(), "Executing goal");
+
+                const auto goal = goal_handle->get_goal(); // Goal values
+                auto feedback = std::make_shared<Fibonacci::Feedback>(); 
+                auto result = std::make_shared<Fibonacci::Result>();
             }
 
     }; // class UR5ActionServer

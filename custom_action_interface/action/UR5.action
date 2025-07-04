@@ -1,18 +1,13 @@
 # Request parameters, I used the same names as the repository for the robot parts
-float64 shoulder_pan_joint  
-float64 shoulder_lift_joint
-float64 elbow_joint
-float64 wrist_1_joint
-float64 wrist_2_joint
-float64 wrist_3_joint
+float64[] joints
 ---
 # Result of the movement
 bool success # Finished the action sucessfuly
-float64 total_duration # Time in ms for the arm movement
+float64 total_duration # Time in ms for the process of executing a goal
+float64 duration_goal_move # Time in ms for receiving the goal and start of the movement
+float64 duration_move # Time in ms for the process of moving the arm
 ---
 # Feedback structure
-float64 elapsed_time_goal_move # Time in ms elapsed since receiving the goal and start of the movement
-float64 elapsed_time_move # Time in ms elapsed since the start and end of the movement
 string status # GOAL_RECEIVED: Action server received the goal 
 		# ARM_MOVING: Arm started the movemment
 		# GOAL_CANCELED: Client canceled the movemment
