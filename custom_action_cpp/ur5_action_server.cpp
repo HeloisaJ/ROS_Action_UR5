@@ -11,8 +11,6 @@
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 #include <trajectory_msgs/msg/joint_trajectory_point.hpp>
 
-#include "custom_action_cpp/visibility_control.h"
-
 namespace custom_action_cpp
 {
     class UR5ActionServer : public rclcpp::Node
@@ -21,18 +19,17 @@ namespace custom_action_cpp
         using UR5 = custom_action_interfaces::action::UR5; // Using the action
         using GoalHandleUR5 = rclcpp_action::ServerGoalHandle<UR5>; // Handle the goal
 
-        CUSTOM_ACTION_CPP_PUBLIC // Constuctor for the UR5ActionServer
-        explicit UR5ActionServer(const rclcpp::NodeOptions & options = rclcpp::NodeOptions()): Node("ur5_action_server", options){
+        explicit UR5ActionServer(const rclcpp::NodeOptions & options = rclcpp::NodeOptions()): Node("ur5_action_server", options){ // Constuctor for the UR5ActionServer
             
             using namespace std::placeholders;
 
-            publisher_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("/joint_trajectory_controller/joint_trajectory" 10);
+            publisher_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("/joint_trajectory_controller/joint_trajectory", 10);
 
             auto handle_goal = [this](const rclcpp_action::GoalUUID & uuid, std::shared_ptr<const UR5::Goal> goal){
                 std::vector<double> joints = goal->joints;
 
-                for(int i = 0; i < joints.size(); i++){
-                    RCLCPP_INFO(this->get_logger(), "Received goal request with movement instuction %d of %f", i, joints[i]);
+                for(long unsigned int i = 0; i < joints.size(); i++){
+                    RCLCPP_INFO(this->get_logger(), "Received goal request with movement instuction %ld of %f", i, joints[i]);
                 }
                 (void)uuid;
                 return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
@@ -63,6 +60,7 @@ namespace custom_action_cpp
 
         private:
             rclcpp_action::Server<UR5>::SharedPtr action_server_;
+            rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr publisher_;
 
             void execute(const std::shared_ptr<GoalHandleUR5> goal_handle){
                 RCLCPP_INFO(this->get_logger(), "Executing goal");
