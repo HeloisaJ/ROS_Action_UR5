@@ -3,9 +3,13 @@
 #include <thread>
 
 #include "custom_action_interfaces/action/ur5.hpp"
+
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "rclcpp_components/register_node_macro.hpp"
+
+#include <trajectory_msgs/msg/joint_trajectory.hpp>
+#include <trajectory_msgs/msg/joint_trajectory_point.hpp>
 
 #include "custom_action_cpp/visibility_control.h"
 
@@ -21,6 +25,8 @@ namespace custom_action_cpp
         explicit UR5ActionServer(const rclcpp::NodeOptions & options = rclcpp::NodeOptions()): Node("ur5_action_server", options){
             
             using namespace std::placeholders;
+
+            publisher_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("/joint_trajectory_controller/joint_trajectory" 10);
 
             auto handle_goal = [this](const rclcpp_action::GoalUUID & uuid, std::shared_ptr<const UR5::Goal> goal){
                 std::vector<double> joints = goal->joints;
@@ -62,8 +68,36 @@ namespace custom_action_cpp
                 RCLCPP_INFO(this->get_logger(), "Executing goal");
 
                 const auto goal = goal_handle->get_goal(); // Goal values
-                auto feedback = std::make_shared<Fibonacci::Feedback>(); 
-                auto result = std::make_shared<Fibonacci::Result>();
+                auto feedback = std::make_shared<UR5::Feedback>(); 
+                auto result = std::make_shared<UR5::Result>();
+                trajectory_msgs::msg::JointTrajectory msg;
+                trajectory_msgs::msg::JointTrajectoryPoint p;
+
+                std::vector<double> joints = goal->joints;
+
+                for(double j: joints){
+                    if (goal_handle->is_canceling()) {
+                        result->success = false;
+                        feedback->status = "GOAL_CANCELED";
+                        return;
+                    }
+
+                    if (std::isnan(j)){
+                        RCLCPP_WARN(this->get_logger(), "Joint state contains NaN values");
+                        result->success = false;
+                        feedback->status = "GOAL_ABORTED";
+                        return;
+                    }
+                }
+
+                msg.joint_names = {"shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
+                p.positions = joints;
+                //p.time_from_start = rclcpp::Duration::from_seconds(2.0);
+
+                msg.points.push_back(p);
+                publisher_->publish(msg);
+
+                RCLCPP_INFO(this->get_logger(), "Trajectory sent to robot");
             }
 
     }; // class UR5ActionServer
