@@ -23,7 +23,7 @@ namespace custom_action_cpp
             
             using namespace std::placeholders;
 
-            publisher_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("/joint_trajectory_controller/joint_trajectory", 10);
+            publisher_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("/scaled_joint_trajectory_controller/joint_trajectory", 10);
 
             auto handle_goal = [this](const rclcpp_action::GoalUUID & uuid, std::shared_ptr<const UR5::Goal> goal){
                 std::vector<double> joints = goal->joints;
@@ -86,11 +86,12 @@ namespace custom_action_cpp
                         feedback->status = "GOAL_ABORTED";
                         return;
                     }
+
+                    p.positions.push_back(j);
                 }
 
                 msg.joint_names = {"shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
-                p.positions = joints;
-                //p.time_from_start = rclcpp::Duration::from_seconds(2.0);
+                p.time_from_start = rclcpp::Duration::from_seconds(2.0);
 
                 msg.points.push_back(p);
                 publisher_->publish(msg);
