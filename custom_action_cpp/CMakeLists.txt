@@ -38,7 +38,7 @@ ament_target_dependencies(action_server
   "rclcpp_action"
   "rclcpp_components"
   "trajectory_msgs")
-rclcpp_components_register_node(action_server PLUGIN "custom_action_cpp::UR5ActionServer" EXECUTABLE fibonacci_action_server)
+rclcpp_components_register_node(action_server PLUGIN "custom_action_cpp::UR5ActionServer" EXECUTABLE ur5_action_server)
 install(TARGETS
   action_server
   ARCHIVE DESTINATION lib
