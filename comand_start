@@ -24,4 +24,4 @@ ros2 action send_goal /ur5_move custom_action_interfaces/action/UR5 "joints:
 - -1.96
 - -1.6
 - 0.0
-time_from_start: {sec: 2, nanosec: 0}"
+"

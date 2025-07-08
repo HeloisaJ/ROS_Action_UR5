@@ -11,6 +11,8 @@
 #include <trajectory_msgs/msg/joint_trajectory.hpp>
 #include <trajectory_msgs/msg/joint_trajectory_point.hpp>
 
+#include <control_msgs/msg/joint_trajectory_controller_state.hpp>
+
 namespace custom_action_cpp
 {
     class UR5ActionServer : public rclcpp::Node
@@ -24,6 +26,8 @@ namespace custom_action_cpp
             using namespace std::placeholders;
 
             publisher_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("/scaled_joint_trajectory_controller/joint_trajectory", 10);
+
+            joints_map_ = this->create_subscription<control_msgs::msg::JointTrajectoryControllerState>("/scaled_joint_trajectory_controller/controller_state", 10, std::bind(&UR5ActionServer::joint_state_callback, this, std::placeholders::_1));
 
             auto handle_goal = [this](const rclcpp_action::GoalUUID & uuid, std::shared_ptr<const UR5::Goal> goal){
                 std::vector<double> joints = goal->joints;
@@ -62,16 +66,23 @@ namespace custom_action_cpp
             rclcpp_action::Server<UR5>::SharedPtr action_server_;
             rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr publisher_;
 
-            void execute(const std::shared_ptr<GoalHandleUR5> goal_handle){
-                RCLCPP_INFO(this->get_logger(), "Executing goal");
+            bool joint_callback_active = true;
+            std::vector<double> joints;
+            auto result;
+            auto feedback;
 
+            void execute(const std::shared_ptr<GoalHandleUR5> goal_handle){
                 const auto goal = goal_handle->get_goal(); // Goal values
-                auto feedback = std::make_shared<UR5::Feedback>(); 
-                auto result = std::make_shared<UR5::Result>();
+                feedback = std::make_shared<UR5::Feedback>();
+                feedback->status = "GOAL_RECEIVED";
+
+                result = std::make_shared<UR5::Result>();
                 trajectory_msgs::msg::JointTrajectory msg;
                 trajectory_msgs::msg::JointTrajectoryPoint p;
 
-                std::vector<double> joints = goal->joints;
+                RCLCPP_INFO(this->get_logger(), "Executing goal");
+
+                joints = goal->joints;
 
                 for(double j: joints){
                     if (goal_handle->is_canceling()) {
@@ -95,8 +106,34 @@ namespace custom_action_cpp
 
                 msg.points.push_back(p);
                 publisher_->publish(msg);
+                feedback->status = "ARM_MOVING";
+                // start timer here for duration move
 
                 RCLCPP_INFO(this->get_logger(), "Trajectory sent to robot");
+            }
+
+            void joint_state_callback(control_msgs::msg::JointTrajectoryControllerState msg){
+
+                if (!joint_callback_active){
+                    return;
+                }
+
+                const auto& act = msg->actual.positions;
+                double max_error = 0;
+                double error;
+
+                for (long unsigned int i = 0; i < joints.size(); i++){
+                    error = abs(act[i] - joints[i]);
+                    if (error > max_error){
+                        max_error = error;
+                    }
+                }
+
+                if (max_error <= 0.01){
+                    joint_callback_active = false;
+                    result->success = true;
+                    feedback->status = "GOAL_ENDED_SUCESS";
+                }
             }
 
     }; // class UR5ActionServer
