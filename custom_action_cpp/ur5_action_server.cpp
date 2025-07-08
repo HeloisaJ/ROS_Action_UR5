@@ -65,6 +65,7 @@ namespace custom_action_cpp
         private:
             rclcpp_action::Server<UR5>::SharedPtr action_server_;
             rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr publisher_;
+            rclcpp::Time start_arm_move;
 
             bool joint_callback_active = true;
             std::vector<double> joints;
@@ -107,7 +108,7 @@ namespace custom_action_cpp
                 msg.points.push_back(p);
                 publisher_->publish(msg);
                 feedback->status = "ARM_MOVING";
-                // start timer here for duration move
+                start_arm_move = this->now();
 
                 RCLCPP_INFO(this->get_logger(), "Trajectory sent to robot");
             }
@@ -130,6 +131,7 @@ namespace custom_action_cpp
                 }
 
                 if (max_error <= 0.01){
+                    result->duration_move = (now() - start_arm_move).nanoseconds();
                     joint_callback_active = false;
                     result->success = true;
                     feedback->status = "GOAL_ENDED_SUCESS";
