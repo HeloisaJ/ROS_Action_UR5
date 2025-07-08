@@ -30,7 +30,7 @@ To test, source and then ```ros2 interface show custom_action_interfaces/action/
 
 - In the src folder add the ```ur5_action_server.cpp``` file. 
 
-- Change the ```CMakeLists.txt``` file to the CMake file on this repository.
+- Change the ```CMakeLists.txt``` and ```package.xml``` file to the files on this repository.
 
 - Do ```colcon build```.
 

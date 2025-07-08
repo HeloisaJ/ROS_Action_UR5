@@ -26,7 +26,6 @@ namespace custom_action_cpp
             using namespace std::placeholders;
 
             publisher_ = this->create_publisher<trajectory_msgs::msg::JointTrajectory>("/scaled_joint_trajectory_controller/joint_trajectory", 10);
-
             joints_map_ = this->create_subscription<control_msgs::msg::JointTrajectoryControllerState>("/scaled_joint_trajectory_controller/controller_state", 10, std::bind(&UR5ActionServer::joint_state_callback, this, std::placeholders::_1));
 
             auto handle_goal = [this](const rclcpp_action::GoalUUID & uuid, std::shared_ptr<const UR5::Goal> goal){
@@ -65,12 +64,13 @@ namespace custom_action_cpp
         private:
             rclcpp_action::Server<UR5>::SharedPtr action_server_;
             rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr publisher_;
+            rclcpp::Subscription<control_msgs::msg::JointTrajectoryControllerState>::SharedPtr joints_map_;
             rclcpp::Time start_arm_move;
 
-            bool joint_callback_active = true;
+            bool joint_callback_active = false;
             std::vector<double> joints;
-            auto result;
-            auto feedback;
+            std::shared_ptr<UR5::Result> result;
+            std::shared_ptr<UR5::Feedback> feedback;
 
             void execute(const std::shared_ptr<GoalHandleUR5> goal_handle){
                 const auto goal = goal_handle->get_goal(); // Goal values
@@ -108,7 +108,8 @@ namespace custom_action_cpp
                 msg.points.push_back(p);
                 publisher_->publish(msg);
                 feedback->status = "ARM_MOVING";
-                start_arm_move = this->now();
+                start_arm_move = now();
+                joint_callback_active = true;
 
                 RCLCPP_INFO(this->get_logger(), "Trajectory sent to robot");
             }
@@ -119,7 +120,8 @@ namespace custom_action_cpp
                     return;
                 }
 
-                const auto& act = msg->actual.positions;
+                RCLCPP_INFO(this->get_logger(), "Callback");
+                const auto& act = msg.feedback.positions;
                 double max_error = 0;
                 double error;
 

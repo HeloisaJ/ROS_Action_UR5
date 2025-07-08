@@ -12,6 +12,7 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(trajectory_msgs REQUIRED)
+find_package(control_msgs REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -37,7 +38,8 @@ ament_target_dependencies(action_server
   "rclcpp"
   "rclcpp_action"
   "rclcpp_components"
-  "trajectory_msgs")
+  "trajectory_msgs"
+  "control_msgs")
 rclcpp_components_register_node(action_server PLUGIN "custom_action_cpp::UR5ActionServer" EXECUTABLE ur5_action_server)
 install(TARGETS
   action_server
