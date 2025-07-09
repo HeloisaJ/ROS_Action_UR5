@@ -1,6 +1,7 @@
 #include <functional>
 #include <memory>
 #include <thread>
+#include <map>
 
 #include "custom_action_interfaces/action/ur5.hpp"
 
@@ -29,11 +30,8 @@ namespace custom_action_cpp
             joints_map_ = this->create_subscription<control_msgs::msg::JointTrajectoryControllerState>("/scaled_joint_trajectory_controller/controller_state", 10, std::bind(&UR5ActionServer::joint_state_callback, this, std::placeholders::_1));
 
             auto handle_goal = [this](const rclcpp_action::GoalUUID & uuid, std::shared_ptr<const UR5::Goal> goal){
-                std::vector<double> joints = goal->joints;
+                RCLCPP_INFO(this->get_logger(), "Received goal request with movement instruction", goal->execute);
 
-                for(long unsigned int i = 0; i < joints.size(); i++){
-                    RCLCPP_INFO(this->get_logger(), "Received goal request with movement instuction %ld of %f", i, joints[i]);
-                }
                 (void)uuid;
                 return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
             };
@@ -68,50 +66,37 @@ namespace custom_action_cpp
             rclcpp::Time start_arm_move;
 
             bool joint_callback_active = false;
-            std::vector<double> joints;
+
+            std::map<std::string, std::vector<double>> commands_map = {
+                {"default": {-1.41, -0.96, -1.8, -1.96, -1.6, 0.0}}
+            };
+
             std::shared_ptr<UR5::Result> result;
             std::shared_ptr<UR5::Feedback> feedback;
             std::shared_ptr<GoalHandleUR5> goal_handle;
 
-            void execute(const std::shared_ptr<GoalHandleUR5> gh){
+            void init(const std::shared_ptr<GoalHandleUR5> gh){
                 goal_handle = gh;
-                const auto goal = goal_handle->get_goal(); // Goal values
                 feedback = std::make_shared<UR5::Feedback>();
+                result = std::make_shared<UR5::Result>();
+
+                const auto goal = goal_handle->get_goal(); // Obtain goal
+            }
+
+            void execute(const std::shared_ptr<GoalHandleUR5> gh){
+                
+                init();
+
                 feedback->status = "GOAL_RECEIVED";
                 goal_handle->publish_feedback(feedback);
 
-                result = std::make_shared<UR5::Result>();
                 trajectory_msgs::msg::JointTrajectory msg;
                 trajectory_msgs::msg::JointTrajectoryPoint p;
 
                 RCLCPP_INFO(this->get_logger(), "Executing goal");
 
-                joints = goal->joints;
-
-                for(double j: joints){
-                    if (goal_handle->is_canceling()) {
-                        result->success = false;
-                        goal_handle->canceled(result);
-
-                        feedback->status = "GOAL_CANCELED";
-                        goal_handle->publish_feedback(feedback);
-                        return;
-                    }
-
-                    if (std::isnan(j)){
-                        RCLCPP_WARN(this->get_logger(), "Joint state contains NaN values");
-                        result->success = false;
-                        goal_handle->canceled(result);
-
-                        feedback->status = "GOAL_ABORTED";
-                        goal_handle->publish_feedback(feedback);
-                        return;
-                    }
-
-                    p.positions.push_back(j);
-                }
-
                 msg.joint_names = {"shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint"};
+                p.positions = commands_map[goal->execute];
                 p.time_from_start = rclcpp::Duration::from_seconds(2.0);
 
                 msg.points.push_back(p);
