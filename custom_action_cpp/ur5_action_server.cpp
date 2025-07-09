@@ -71,11 +71,14 @@ namespace custom_action_cpp
             std::vector<double> joints;
             std::shared_ptr<UR5::Result> result;
             std::shared_ptr<UR5::Feedback> feedback;
+            std::shared_ptr<GoalHandleUR5> goal_handle;
 
-            void execute(const std::shared_ptr<GoalHandleUR5> goal_handle){
+            void execute(const std::shared_ptr<GoalHandleUR5> gh){
+                goal_handle = gh;
                 const auto goal = goal_handle->get_goal(); // Goal values
                 feedback = std::make_shared<UR5::Feedback>();
                 feedback->status = "GOAL_RECEIVED";
+                goal_handle->publish_feedback(feedback);
 
                 result = std::make_shared<UR5::Result>();
                 trajectory_msgs::msg::JointTrajectory msg;
@@ -88,14 +91,20 @@ namespace custom_action_cpp
                 for(double j: joints){
                     if (goal_handle->is_canceling()) {
                         result->success = false;
+                        goal_handle->canceled(result);
+
                         feedback->status = "GOAL_CANCELED";
+                        goal_handle->publish_feedback(feedback);
                         return;
                     }
 
                     if (std::isnan(j)){
                         RCLCPP_WARN(this->get_logger(), "Joint state contains NaN values");
                         result->success = false;
+                        goal_handle->canceled(result);
+
                         feedback->status = "GOAL_ABORTED";
+                        goal_handle->publish_feedback(feedback);
                         return;
                     }
 
@@ -107,8 +116,9 @@ namespace custom_action_cpp
 
                 msg.points.push_back(p);
                 publisher_->publish(msg);
-                feedback->status = "ARM_MOVING";
                 start_arm_move = now();
+                feedback->status = "ARM_MOVING";
+                goal_handle->publish_feedback(feedback);
                 joint_callback_active = true;
 
                 RCLCPP_INFO(this->get_logger(), "Trajectory sent to robot");
@@ -120,7 +130,6 @@ namespace custom_action_cpp
                     return;
                 }
 
-                RCLCPP_INFO(this->get_logger(), "Callback");
                 const auto& act = msg.feedback.positions;
                 double max_error = 0;
                 double error;
@@ -135,8 +144,12 @@ namespace custom_action_cpp
                 if (max_error <= 0.01){
                     result->duration_move = (now() - start_arm_move).nanoseconds();
                     joint_callback_active = false;
+
+                    feedback->status = "GOAL_ENDED_SUCCESS";
+                    goal_handle->publish_feedback(feedback);
+
                     result->success = true;
-                    feedback->status = "GOAL_ENDED_SUCESS";
+                    goal_handle->succeed(result);
                 }
             }
 
