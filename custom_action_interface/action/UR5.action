@@ -1,5 +1,5 @@
-# Request parameters, I used the same names as the repository for the robot parts
-float64[] joints
+# Request parameters
+string execute # A task to be executed by the server
 ---
 # Result of the movement
 bool success # Finished the action sucessfuly
