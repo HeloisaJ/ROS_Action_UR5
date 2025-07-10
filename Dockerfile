@@ -52,6 +52,10 @@ RUN rosdep init && rosdep update
 # Create and setup workspace
 RUN mkdir -p /ros2_ws/src
 WORKDIR /ros2_ws/src/
+
+# Setup environment
+RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc
+
 RUN ros2 pkg create --license Apache-2.0 custom_action_interfaces
 WORKDIR custom_action_interfaces
 RUN mkdir /action && \
@@ -61,6 +65,3 @@ COPY ./custom_action_interface/CMakeLists.txt ./
 COPY ./custom_action_interface/package.xml ./
 COPY ./custom_action_interface/action/UR5.action ./action/
 RUN colcon build
-
-# Setup environment
-RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc
