@@ -30,7 +30,7 @@ namespace custom_action_cpp
             joints_map_ = this->create_subscription<control_msgs::msg::JointTrajectoryControllerState>("/scaled_joint_trajectory_controller/controller_state", 10, std::bind(&UR5ActionServer::joint_state_callback, this, std::placeholders::_1));
 
             auto handle_goal = [this](const rclcpp_action::GoalUUID & uuid, std::shared_ptr<const UR5::Goal> goal){
-                RCLCPP_INFO(this->get_logger(), "Received goal request with movement instruction", goal->execute);
+                RCLCPP_INFO(this->get_logger(), "Received goal request with movement instruction %s", goal->execute);
 
                 (void)uuid;
                 return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
@@ -68,7 +68,8 @@ namespace custom_action_cpp
             bool joint_callback_active = false;
 
             std::map<std::string, std::vector<double>> commands_map = {
-                {"default": {-1.41, -0.96, -1.8, -1.96, -1.6, 0.0}}
+                {"default", {-1.599998, -1.719986, -2.199983, -0.810036, 1.599995, -0.029998}},
+                {"move_to_block", {-1.41, -0.96, -1.8, -1.96, -1.6, 0.0}}
             };
 
             std::shared_ptr<UR5::Result> result;
@@ -79,13 +80,13 @@ namespace custom_action_cpp
                 goal_handle = gh;
                 feedback = std::make_shared<UR5::Feedback>();
                 result = std::make_shared<UR5::Result>();
-
-                const auto goal = goal_handle->get_goal(); // Obtain goal
             }
 
             void execute(const std::shared_ptr<GoalHandleUR5> gh){
                 
-                init();
+                init(gh);
+
+                const auto goal = goal_handle->get_goal(); // Obtain goal
 
                 feedback->status = "GOAL_RECEIVED";
                 goal_handle->publish_feedback(feedback);
@@ -115,12 +116,13 @@ namespace custom_action_cpp
                     return;
                 }
 
-                const auto& act = msg.feedback.positions;
+                const auto& act = msg.feedback.positions; // Use ros2 interface show control_msgs/msg/JointTrajectoryControllerState to see more info
+                const auto& des = msg.reference.positions;
                 double max_error = 0;
                 double error;
 
-                for (long unsigned int i = 0; i < joints.size(); i++){
-                    error = abs(act[i] - joints[i]);
+                for (long unsigned int i = 0; i < des.size(); i++){
+                    error = abs(act[i] - des[i]);
                     if (error > max_error){
                         max_error = error;
                     }
