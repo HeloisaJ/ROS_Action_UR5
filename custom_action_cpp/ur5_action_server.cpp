@@ -30,7 +30,7 @@ namespace custom_action_cpp
             joints_map_ = this->create_subscription<control_msgs::msg::JointTrajectoryControllerState>("/scaled_joint_trajectory_controller/controller_state", 10, std::bind(&UR5ActionServer::joint_state_callback, this, std::placeholders::_1));
 
             auto handle_goal = [this](const rclcpp_action::GoalUUID & uuid, std::shared_ptr<const UR5::Goal> goal){
-                RCLCPP_INFO(this->get_logger(), "Received goal request with movement instruction %s", goal->execute);
+                RCLCPP_INFO(this->get_logger(), "Received goal request with movement instruction");
 
                 (void)uuid;
                 return rclcpp_action::GoalResponse::ACCEPT_AND_EXECUTE;
