@@ -25,6 +25,7 @@ RUN apt-get install -y --no-install-recommends \
     dnsutils \
     nano \
     software-properties-common \
+    build-essential \
     cmake \
     && rm -rf /var/lib/apt/lists/*
 
@@ -38,13 +39,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-argcomplete \
     python3-colcon-common-extensions \
     python3-rosdep \
+    python3-opencv \
+    python3-vcstool \
     ros-${ROS_DISTRO}-turtlesim \
     ros-${ROS_DISTRO}-rmw-zenoh-cpp \
     ros-${ROS_DISTRO}-vision-opencv \
-    ros-${ROS_DISTRO}-demo-nodes-cpp \
-    python3-opencv \
-    python3-vcstool \
-    && rm -rf /var/lib/apt/lists/*
+    ros-${ROS_DISTRO}-demo-nodes-cpp && \
+    rm -rf /var/lib/apt/lists/*
 
 # Initialize rosdep
 RUN rosdep init && rosdep update
@@ -56,12 +57,5 @@ WORKDIR /ros2_ws/src/
 # Setup environment
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc
 
-RUN ros2 pkg create --license Apache-2.0 custom_action_interfaces
-WORKDIR custom_action_interfaces
-RUN mkdir /action && \
-    rm CMakeLists.txt && \
-    rm package.xml
-COPY ./custom_action_interface/CMakeLists.txt ./
-COPY ./custom_action_interface/package.xml ./
-COPY ./custom_action_interface/action/UR5.action ./action/
-RUN colcon build
+COPY ./custom_action_interface ./custom_action_interfaces/
+# custom_action_cpp is not necessary if this docker is used as a client only
