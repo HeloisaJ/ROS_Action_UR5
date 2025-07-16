@@ -69,7 +69,9 @@ namespace custom_action_cpp
 
             std::map<std::string, std::vector<double>> commands_map = {
                 {"default", {-1.599998, -1.719986, -2.199983, -0.810036, 1.599995, -0.029998}},
-                {"move_to_block", {-1.41, -0.96, -1.8, -1.96, -1.6, 0.0}}
+                {"pick_up", {-1.41, -0.96, -1.8, -1.96, -1.6, 0.0}},
+                {"pick_front", {0.1, -0.8, -1.6, -2.5, -0.5, -3.13}},
+                {"pick_side", {-0.3, -0.96, -2.2, -1, -1.6, 1.57}}
             };
 
             std::shared_ptr<UR5::Result> result;
