@@ -1,8 +1,28 @@
 # ROS_Action_UR5
 
-## Instructions
+This repository is an implementation of a ROS2 action for a Universal Robots 5 (UR5) robotic arm (more specifically to be used with [**pla10/ros2_ur5_interface**](https://github.com/pla10/ros2_ur5_interface)). It mainly features an ```UR5.action``` file that defines the structure of three available types of messages: goal, result, and feedback.
 
-- Enter ros2ws folder and create two packages on the src folder.
+## Index
+
+- [Repository Structure](#repository-structure)
+- [Instructions for Available Docker Implementation](#instructions-for-using-the-docker-containers)
+- [Instructions for configuring the packages manually](#instructions-for-configuring-the-packages-manually)
+- [How to initialize client and server comunication](#how-to-initialize-client-and-server-comunication)
+
+---
+## Repository Structure
+
+a
+
+---
+## Instructions for using the docker containers
+
+The following explanation shows how to initialize the two available containers for the simulation.
+
+---
+## Instructions for configuring the packages manually
+
+- Enter ```/ros2ws``` folder and create two packages on the src folder.
 
 - To create the package with the action, use:
 
@@ -35,3 +55,6 @@ To test, source and then ```ros2 interface show custom_action_interfaces/action/
 - Do ```colcon build```.
 
 To initialize the server, source and then ```ros2 run custom_action_cpp ur5_action_server```.
+
+---
+## How to initialize client and server comunication
