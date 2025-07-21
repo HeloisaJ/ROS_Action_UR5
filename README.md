@@ -5,6 +5,7 @@ This repository is an implementation of a ROS2 action for a Universal Robots 5 (
 ## Index
 
 - [Repository Structure](#repository-structure)
+- [Repository Features](#features)
 - [Instructions for Available Docker Implementation](#instructions-for-using-the-docker-containers)
 - [Instructions for configuring the packages manually](#instructions-for-configuring-the-packages-manually)
 - [How to initialize client and server comunication](#how-to-initialize-client-and-server-comunication)
@@ -12,7 +13,30 @@ This repository is an implementation of a ROS2 action for a Universal Robots 5 (
 ---
 ## Repository Structure
 
-a
+```plaintext
+.
+├── custom_action_cpp/
+│   ├── CMakeLists.txt
+│   ├── package.xml
+│   ├── src/
+│       ├── ur5_action_server.cpp
+├── custom_action_interface/
+│   ├── CMakeLists.txt
+│   ├── package.xml
+│   ├── action/
+│       ├── UR5.action
+├── docker/
+│   ├── client/
+│       ├── Dockerfile
+│   ├── server/
+│       ├── Dockerfile
+├── scripts/
+│   ├── init_client.sh
+│   ├── init_server.sh
+├── .gitignore
+├── command_start
+├── README.md
+```
 
 ---
 ## Features
