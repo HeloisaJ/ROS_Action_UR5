@@ -31,17 +31,17 @@ This repository is an implementation of a ROS2 action for a Universal Robots 5 (
 │   ├── server/
 │       ├── Dockerfile                  # Server Dockerfile
 ├── scripts/
-│   ├── init_client.sh
-│   ├── init_server.sh
+│   ├── init_client.sh                  # Script for initializing the docker client container
+│   ├── init_server.sh                  # Script for initializing the docker server container
 ├── .gitignore
-├── command_start
-├── README.md
+├── command_start                       # Presents two commands for moving the arm one for topic and one for action
+├── README.md                           # Project documentation and how-to-use instructions
 ```
 
 ---
 ## Features
 
-It mainly features an ```UR5.action``` file that defines the structure of three available types of messages: 
+This repository mainly features an ```UR5.action``` file that defines the structure of three available types of messages: 
 
 - Goal
 - Result
