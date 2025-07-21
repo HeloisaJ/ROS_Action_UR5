@@ -1,6 +1,6 @@
 # ROS_Action_UR5
 
-This repository is an implementation of a ROS2 action for a Universal Robots 5 (UR5) robotic arm (more specifically to be used with [**pla10/ros2_ur5_interface**](https://github.com/pla10/ros2_ur5_interface)). It mainly features an ```UR5.action``` file that defines the structure of three available types of messages: goal, result, and feedback.
+This repository is an implementation of a ROS2 action for a Universal Robots 5 (UR5) robotic arm (more specifically to be used with [**pla10/ros2_ur5_interface**](https://github.com/pla10/ros2_ur5_interface)).
 
 ## Index
 
@@ -13,6 +13,17 @@ This repository is an implementation of a ROS2 action for a Universal Robots 5 (
 ## Repository Structure
 
 a
+
+---
+## Features
+
+It mainly features an ```UR5.action``` file that defines the structure of three available types of messages: 
+
+- Goal
+- Result
+- Feedback
+
+Also, this project presents a server file written in C++ (```ur5_action_server.cpp```) that defines the client commands for UR5 arm movement, and the configuration files (CMake and XML) for the respective packages.
 
 ---
 ## Instructions for using the docker containers
