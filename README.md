@@ -15,21 +15,21 @@ This repository is an implementation of a ROS2 action for a Universal Robots 5 (
 
 ```plaintext
 .
-├── custom_action_cpp/
+├── custom_action_cpp/                  # Package containing the action server
 │   ├── CMakeLists.txt
 │   ├── package.xml
 │   ├── src/
-│       ├── ur5_action_server.cpp
-├── custom_action_interface/
+│       ├── ur5_action_server.cpp       # Server code in C++
+├── custom_action_interface/            # Package containing the action definition
 │   ├── CMakeLists.txt
 │   ├── package.xml
 │   ├── action/
-│       ├── UR5.action
-├── docker/
+│       ├── UR5.action                  # Definition of the actions goal, server and feedback
+├── docker/                             # Folder containing the image definitions for server and client containers
 │   ├── client/
-│       ├── Dockerfile
+│       ├── Dockerfile                  # Client Dockerfile
 │   ├── server/
-│       ├── Dockerfile
+│       ├── Dockerfile                  # Server Dockerfile
 ├── scripts/
 │   ├── init_client.sh
 │   ├── init_server.sh
