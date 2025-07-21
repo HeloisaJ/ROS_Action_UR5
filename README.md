@@ -53,6 +53,8 @@ Also, this project presents a server file written in C++ (```ur5_action_server.c
 
 ### Goal Structure
 
+- **execute:** A string containing the name of the command for moving the UR5. There are four commands: 
+
 ### Result Structure
 
 ### Feedback Structure
@@ -108,7 +110,7 @@ Initialize one of the hosts (docker container or other device), open one termina
 ros2 run custom_action_cpp ur5_action_server
 ```
 
-In another host, use the structure of the second command in ```command_start```, this will activate the client. The execute commands are described in the [features topic](#features).
+In another host, use the structure of the second command in ```command_start```, this will send a message as a client to the server. The available commands are described in the [features topic](#features).
 
 ```
 ros2 action send_goal /ur5_move custom_action_interfaces/action/UR5 "execute: default"
