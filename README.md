@@ -35,7 +35,7 @@ This repository is an implementation of a ROS2 action for a Universal Robots 5 (
 │   ├── init_server.sh                  # Script for initializing the docker server container
 ├── .gitignore
 ├── command_start                       # Presents two commands for moving the arm one for topic and one for action
-├── README.md                           # Project documentation and how-to-use instructions
+├── README.md                           # Project documentation 
 ```
 
 ---
@@ -48,6 +48,14 @@ This repository mainly features an ```UR5.action``` file that defines the struct
 - Feedback
 
 Also, this project presents a server file written in C++ (```ur5_action_server.cpp```) that defines the client commands for UR5 arm movement, and the configuration files (CMake and XML) for the respective packages.
+
+**Disclaimer**: This repository does not include the code for the robotic arm, the code used for the UR5 is available at: [**pla10/ros2_ur5_interface**](https://github.com/pla10/ros2_ur5_interface).
+
+### Goal Structure
+
+### Result Structure
+
+### Feedback Structure
 
 ---
 ## Instructions for using the docker containers
@@ -71,7 +79,7 @@ ros2 pkg create --license Apache-2.0 custom_action_interfaces
 ros2 pkg create --dependencies custom_action_interfaces rclcpp rclcpp_action rclcpp_components --license Apache-2.0 -- custom_action_cpp
 ```
 
-### custom_action_interfaces
+### In the custom_action_interfaces package:
 
 - Create an ```action``` folder and add the ```UR5.action``` file.
 
@@ -81,7 +89,7 @@ ros2 pkg create --dependencies custom_action_interfaces rclcpp rclcpp_action rcl
 
 To test, source and then ```ros2 interface show custom_action_interfaces/action/UR5```.
 
-### custom_action_cpp
+### In the custom_action_cpp package:
 
 - In the src folder add the ```ur5_action_server.cpp``` file. 
 
@@ -89,7 +97,21 @@ To test, source and then ```ros2 interface show custom_action_interfaces/action/
 
 - Do ```colcon build```.
 
-To initialize the server, source and then ```ros2 run custom_action_cpp ur5_action_server```.
-
 ---
-## How to initialize client and server comunication
+## How to initialize client and server communication
+
+**Remember to build the code and then source in each terminal.**
+
+Initialize one of the hosts (docker container or other device), open one terminal and activate the RViz simulation and in another terminal use this command to activate the server:
+
+```
+ros2 run custom_action_cpp ur5_action_server
+```
+
+In another host, use the structure of the second command in ```command_start```, this will activate the client. The execute commands are described in the [features topic](#features).
+
+```
+ros2 action send_goal /ur5_move custom_action_interfaces/action/UR5 "execute: default"
+```
+
+Then observate the move on RViz.
