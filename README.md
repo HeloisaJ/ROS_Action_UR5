@@ -55,6 +55,22 @@ Also, this project presents a server file written in C++ (```ur5_action_server.c
 
 - **execute:** A string containing the name of the command for moving the UR5. There are four commands: 
 
+    - **default**
+
+        ![default](images/default.png)
+
+    - **pick_up**
+
+        ![pick_up](images/pick_up.png)
+
+    - **pick_front**
+
+        ![pick_front](images/pick_front.png)
+
+    - **pick_side**
+
+        ![pick_side](images/pick_side.png)
+
 ### Result Structure
 
 ### Feedback Structure
