@@ -6,8 +6,8 @@ This repository is an implementation of a ROS2 action for a Universal Robots 5 (
 
 - [Repository Structure](#repository-structure)
 - [Repository Features](#features)
-- [Instructions for Available Docker Implementation](#instructions-for-using-the-docker-containers)
-- [Instructions for configuring the packages manually](#instructions-for-configuring-the-packages-manually)
+- [Instructions for Available Docker Implementation](#instructions-for-available-docker-implementation)
+- [Instructions for Configuring the Packages Manually](#instructions-for-configuring-the-packages-manually)
 - [How to initialize client and server comunication](#how-to-initialize-client-and-server-comunication)
 
 ---
@@ -60,12 +60,12 @@ Also, this project presents a server file written in C++ (```ur5_action_server.c
 ### Feedback Structure
 
 ---
-## Instructions for using the docker containers
+## Instructions for Available Docker Implementation
 
 The following explanation shows how to initialize the two available containers for the simulation.
 
 ---
-## Instructions for configuring the packages manually
+## Instructions for Configuring the Packages Manually
 
 - Enter ```/ros2ws``` folder and create two packages on the src folder.
 
@@ -100,9 +100,17 @@ To test, source and then ```ros2 interface show custom_action_interfaces/action/
 - Do ```colcon build```.
 
 ---
-## How to initialize client and server communication
+## How to Initialize Client and Server Communication
 
 **Remember to build the code and then source in each terminal.**
+
+If you decided not to use the docker implementation, for communication between client and server on the same subnet, set the ```ROS_DOMAIN_ID``` to a specific number and export the ```ROS_DOMAIN_ID``` for **all terminals**. Example:
+
+```
+ROS_DOMAIN_ID=42
+echo $ROS_DOMAIN_ID     # See if the ROS_DOMAIN_ID was configured correctly
+export ROS_DOMAIN_ID
+```
 
 Initialize one of the hosts (docker container or other device), open one terminal and activate the RViz simulation and in another terminal use this command to activate the server:
 
