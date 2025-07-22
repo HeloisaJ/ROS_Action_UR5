@@ -90,7 +90,39 @@ Also, this project presents a server file written in C++ (```ur5_action_server.c
 ---
 ## Instructions for Available Docker Implementation
 
-The following explanation shows how to initialize the two available containers for the simulation.
+The following explanation shows how to initialize the two available containers for the simulation. First of all, build the two containers, this can take some time because of the ROS2 instalation. Use the following commands on the terminal for building the containers (this should used on the repository folder):
+
+- Build server container:
+
+```
+docker build -f docker/server/Dockerfile -t ros2_sv .
+```
+
+- Build client container:
+
+```
+docker build -f docker/client/Dockerfile -t ros2_cl .
+```
+
+Before activating the containers, use the following command to allow the RViz to open a window while running the application inside a docker container:
+
+```
+xhost +local:docker
+```
+
+To start running both of the containers and to access their terminals, use the scripts available at the ```scripts``` folder:
+
+- Run the server container:
+
+```
+bash scripts/init_server.sh
+```
+
+- Run the client container:
+
+```
+bash scripts/init_client.sh
+```
 
 ---
 ## Instructions for Configuring the Packages Manually
