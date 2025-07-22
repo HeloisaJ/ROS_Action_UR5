@@ -4,11 +4,41 @@ This repository is an implementation of a ROS2 action for a Universal Robots 5 (
 
 ## Index
 
+- [Prerequisites](#prerequisites)
 - [Repository Structure](#repository-structure)
 - [Repository Features](#features)
 - [Instructions for Available Docker Implementation](#instructions-for-available-docker-implementation)
 - [Instructions for Configuring the Packages Manually](#instructions-for-configuring-the-packages-manually)
-- [How to initialize client and server comunication](#how-to-initialize-client-and-server-comunication)
+- [How to Initialize Client and Server Communication](#how-to-initialize-client-and-server-communication)
+
+---
+## Prerequisites
+
+- If your only going to use the docker application then or the code and containers from ros2_ur5_interface:
+
+    - **Docker**
+    - **Docker Network** (if using ros2_ur5_interface):
+
+    ```bash
+    docker network create --subnet=192.168.56.0/24 ursim_net
+    ```
+- If you will not use any docker containers:
+
+    - **Build Essential**
+    - **CMake**
+    - **Gazebo**
+    - **ROS2 jazzy**
+    - **ROS2 jazzy UR Robot Driver**
+    - **ROS2 jazzy ros-gz**
+    - **ROS2 jazzy gz-ros2-control**
+    - **ROS2 jazzy ros2-control**
+    - **ROS2 jazzy ros2-controllers**
+    - **Rosdep**
+    - **RViz**
+    - **Python 3**
+    - **python3-vcstool**
+    - **python3-argcomplete**
+    - **Colcon Common Extensions**
 
 ---
 ## Repository Structure
