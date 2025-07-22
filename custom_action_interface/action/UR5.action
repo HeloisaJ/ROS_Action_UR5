@@ -3,9 +3,9 @@ string execute # A task to be executed by the server
 ---
 # Result of the movement
 bool success # Finished the action sucessfuly
-float64 total_duration # Time in ms for the process of executing a goal
-float64 duration_goal_move # Time in ms for receiving the goal and start of the movement
-float64 duration_move # Time in ms for the process of moving the arm
+float64 total_duration # Time in ns for the process of executing a goal
+float64 duration_goal_move # Time in ns for receiving the goal and start of the movement
+float64 duration_move # Time in ns for the process of moving the arm
 ---
 # Feedback structure
 string status # GOAL_RECEIVED: Action server received the goal 

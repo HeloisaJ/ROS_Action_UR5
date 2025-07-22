@@ -73,7 +73,19 @@ Also, this project presents a server file written in C++ (```ur5_action_server.c
 
 ### Result Structure
 
+- **success:** Inform the user if the action was executed with success.
+
+- **duration_move:** Counts the time in nanoseconds (ns) for the arm to move from the starting position to the end position.
+
 ### Feedback Structure
+
+- **status:** Inform the user the current state of the action, ther are five status messages:
+
+    - **GOAL_RECEIVED**
+    - **ARM_MOVING**
+    - **GOAL_CANCELED**
+    - **GOAL_ENDED_SUCESS**
+    - **GOAL_ABORTED**
 
 ---
 ## Instructions for Available Docker Implementation
