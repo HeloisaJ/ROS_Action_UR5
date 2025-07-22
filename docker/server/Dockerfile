@@ -35,9 +35,9 @@ RUN apt-get update && \
 RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" > /etc/apt/sources.list.d/ros2.list
 
-# Install ROS 2 packages (ros-base for minimal installation)
+# Install ROS 2 packages 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ros-${ROS_DISTRO}-ros-base \
+    ros-${ROS_DISTRO}-desktop \
     python3-argcomplete \
     python3-colcon-common-extensions \
     python3-rosdep \
@@ -68,7 +68,7 @@ RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc
 COPY /custom_action_interface ./custom_action_interfaces/
 COPY /custom_action_cpp ./custom_action_cpp
 
-# Download the ros2_ur5_interface repository content (not working)
+# Download the ros2_ur5_interface repository content
 RUN git clone https://github.com/pla10/ros2_ur5_interface.git
 
 ENV USER=ubuntu
