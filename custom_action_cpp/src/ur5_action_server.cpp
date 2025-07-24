@@ -64,6 +64,7 @@ namespace custom_action_cpp
             rclcpp::Publisher<trajectory_msgs::msg::JointTrajectory>::SharedPtr publisher_;
             rclcpp::Subscription<control_msgs::msg::JointTrajectoryControllerState>::SharedPtr joints_map_;
             rclcpp::Time start_arm_move;
+            rclcpp::Time goal_received;
 
             bool joint_callback_active = false;
 
@@ -90,6 +91,7 @@ namespace custom_action_cpp
 
                 const auto goal = goal_handle->get_goal(); // Obtain goal
 
+                goal_received = now();
                 feedback->status = "GOAL_RECEIVED";
                 goal_handle->publish_feedback(feedback);
 
@@ -132,6 +134,7 @@ namespace custom_action_cpp
 
                 if (max_error <= 0.01){
                     result->duration_move = (now() - start_arm_move).nanoseconds();
+                    result->duration_goal_move = (start_arm_move - goal_received).nanoseconds();
                     joint_callback_active = false;
 
                     feedback->status = "GOAL_ENDED_SUCCESS";
