@@ -66,7 +66,7 @@ RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc
 
 # Download the repository folders
 COPY /custom_action_interface ./custom_action_interfaces/
-COPY /custom_action_cpp ./custom_action_cpp
+COPY /custom_action_server ./custom_action_server
 
 # Download the ros2_ur5_interface repository content
 RUN git clone https://github.com/pla10/ros2_ur5_interface.git

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(custom_action_cpp)
+project(custom_action_client)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -11,8 +11,7 @@ find_package(custom_action_interfaces REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(rclcpp_components REQUIRED)
-find_package(trajectory_msgs REQUIRED)
-find_package(control_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -26,25 +25,23 @@ if(BUILD_TESTING)
   ament_lint_auto_find_test_dependencies()
 endif()
 
-add_library(action_server SHARED
-  src/ur5_action_server.cpp)
-target_include_directories(action_server PRIVATE
+
+add_library(action_client SHARED
+  src/ur5_action_client.cpp)
+target_include_directories(action_client PRIVATE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-target_compile_definitions(action_server
-  PRIVATE "CUSTOM_ACTION_CPP_BUILDING_DLL")
-ament_target_dependencies(action_server
+target_compile_definitions(action_client
+  PRIVATE "CUSTOM_ACTION_CLIENT_BUILDING_DLL")
+ament_target_dependencies(action_client
   "custom_action_interfaces"
   "rclcpp"
   "rclcpp_action"
   "rclcpp_components"
-  "trajectory_msgs"
-  "control_msgs")
-rclcpp_components_register_node(action_server PLUGIN "custom_action_cpp::UR5ActionServer" EXECUTABLE ur5_action_server)
+  "std_msgs")
+rclcpp_components_register_node(action_client PLUGIN "custom_action_client::UR5ActionClient" EXECUTABLE ur5_action_client)
 install(TARGETS
-  action_server
+  action_client
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin)
-
-ament_package()

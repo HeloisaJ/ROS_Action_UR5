@@ -11,9 +11,9 @@
 #include "rclcpp_action/rclcpp_action.hpp"
 #include "rclcpp_components/register_node_macro.hpp"
 
-#include "std_msgs/msg/string.hpp"
+#include "std_msgs/msg/float64.hpp"
 
-namespace custom_action_cpp
+namespace custom_action_client
 {
     class UR5ActionClient : public rclcpp::Node
     {
@@ -21,9 +21,8 @@ namespace custom_action_cpp
         using UR5 = custom_action_interfaces::action::UR5; // Using the action
         using GoalHandleUR5 = rclcpp_action::ClientGoalHandle<UR5>; // Handle the goal
 
-        publisher_ = this->create_publisher<std_msgs::msg::Float64>("topic", 10);
-
         rclcpp::Time goal_sent;
+        long int delay_client_server;
 
         explicit UR5ActionClient(const rclcpp::NodeOptions & options): Node("ur5_action_client", options){
             this->client_ptr_ = rclcpp_action::create_client<UR5>(
@@ -37,7 +36,7 @@ namespace custom_action_cpp
         }
 
         void send_goal(){
-            using namespace std::placeholders
+            using namespace std::placeholders;
 
             this->timer_->cancel();
 
@@ -47,7 +46,7 @@ namespace custom_action_cpp
             }
 
             auto goal_msg = UR5::Goal();
-            cin << goal_msg.execute; // see if it works
+            std::cin << goal_msg.execute; // see if it works
 
             goal_sent = now();
             RCLCPP_INFO(this->get_logger(), "Sending goal");
@@ -59,12 +58,10 @@ namespace custom_action_cpp
                     RCLCPP_ERROR(this->get_logger(), "Goal was rejected by server");
                 } 
                 else{
-                    auto message = std_msgs::msg::Float64(); 
-                    message.data = (now() - goal_sent).nanoseconds();
-                    this->publisher_->publish(message);
+                    delay_client_server = (now() - goal_sent).nanoseconds();
 
                     std::stringstream ss;
-                    ss << "Goal accepted by server, goal sent" << goal_handle->execute;
+                    ss << "Goal accepted by server, goal sent" << goal_handle.execute;
                     RCLCPP_INFO(this->get_logger(), ss.str().c_str());
                 }
             };
@@ -97,15 +94,17 @@ namespace custom_action_cpp
                 std::stringstream ss;
                 ss << "Duration of Arm Movement: " << result.result->duration_move << "\n";
                 ss << "Duration between Goal Received and Start Movement: " << result.result->duration_goal_move << "\n";
-                ss << "Command Delay Server to Client: " << result.result->command_delay << "\n";
-            }
+                ss << "Command Delay Server to Client: " << delay_client_server << "\n";
+            
+                RCLCPP_INFO(this->get_logger(), ss.str().c_str());
+                rclcpp::shutdown();
+            };
         }
 
         private:
         rclcpp_action::Client<UR5>::SharedPtr client_ptr_;
         rclcpp::TimerBase::SharedPtr timer_;
-        rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
     }; // class UR5ActionClient
-} // namespace custom_action_cpp
+} // namespace custom_action_client
 
-RCLCPP_COMPONENTS_REGISTER_NODE(custom_action_cpp::UR5ActionClient)
+RCLCPP_COMPONENTS_REGISTER_NODE(custom_action_client::UR5ActionClient)
