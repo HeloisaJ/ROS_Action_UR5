@@ -24,18 +24,18 @@ namespace custom_action_client
         rclcpp::Time goal_sent;
         long int delay_client_server;
 
-        explicit UR5ActionClient(const rclcpp::NodeOptions & options): Node("ur5_action_client", options){
+        explicit UR5ActionClient(const std::string & goal, const rclcpp::NodeOptions & options): Node("ur5_action_client", options){
             this->client_ptr_ = rclcpp_action::create_client<UR5>(
             this,
             "ur5_move");
 
-            auto timer_callback_lambda = [this](){ return this->send_goal(); };
+            auto timer_callback_lambda = [this, goal](){ return this->send_goal(goal); };
             this->timer_ = this->create_wall_timer(
             std::chrono::milliseconds(100),
             timer_callback_lambda);
         }
 
-        void send_goal(){
+        void send_goal(const std::string & goal){
             using namespace std::placeholders;
 
             this->timer_->cancel();
@@ -46,7 +46,7 @@ namespace custom_action_client
             }
 
             auto goal_msg = UR5::Goal();
-            std::cin << goal_msg.execute; // see if it works
+            goal_msg.execute = goal;
 
             goal_sent = now();
             RCLCPP_INFO(this->get_logger(), "Sending goal");
@@ -61,7 +61,7 @@ namespace custom_action_client
                     delay_client_server = (now() - goal_sent).nanoseconds();
 
                     std::stringstream ss;
-                    ss << "Goal accepted by server, goal sent" << goal_handle.execute;
+                    ss << "Goal accepted by server";
                     RCLCPP_INFO(this->get_logger(), ss.str().c_str());
                 }
             };
@@ -107,4 +107,13 @@ namespace custom_action_client
     }; // class UR5ActionClient
 } // namespace custom_action_client
 
-RCLCPP_COMPONENTS_REGISTER_NODE(custom_action_client::UR5ActionClient)
+int main(int argc, char * argv[]){
+
+    rclcpp::init(argc, argv);
+
+    std::string goal = argv[0];
+
+    rclcpp::spin(std::make_shared<custom_action_client::UR5ActionClient>(goal, rclcpp::NodeOptions{}));
+    rclcpp::shutdown();
+    return 0;
+}
