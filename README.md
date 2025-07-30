@@ -45,16 +45,21 @@ This repository is an implementation of a ROS2 action for a Universal Robots 5 (
 
 ```plaintext
 .
-├── custom_action_cpp/                  # Package containing the action server
+├── custom_action_client/               # Package containing the action client
 │   ├── CMakeLists.txt
 │   ├── package.xml
 │   ├── src/
-│       ├── ur5_action_server.cpp       # Server code in C++
+│       ├── ur5_action_client.cpp       # Client code in C++
 ├── custom_action_interface/            # Package containing the action definition
 │   ├── CMakeLists.txt
 │   ├── package.xml
 │   ├── action/
 │       ├── UR5.action                  # Definition of the actions goal, server and feedback
+├── custom_action_server/               # Package containing the action server
+│   ├── CMakeLists.txt
+│   ├── package.xml
+│   ├── src/
+│       ├── ur5_action_server.cpp       # Server code in C++
 ├── docker/                             # Folder containing the image definitions for server and client containers
 │   ├── client/
 │       ├── Dockerfile                  # Client Dockerfile
@@ -64,7 +69,7 @@ This repository is an implementation of a ROS2 action for a Universal Robots 5 (
 │   ├── init_client.sh                  # Script for initializing the docker client container
 │   ├── init_server.sh                  # Script for initializing the docker server container
 ├── .gitignore
-├── command_start                       # Presents two commands for moving the arm one for topic and one for action
+├── command_start                       # Presents three commands for moving the arm one for topic and two for action
 ├── README.md                           # Project documentation 
 ```
 
@@ -77,7 +82,7 @@ This repository mainly features an ```UR5.action``` file that defines the struct
 - Result
 - Feedback
 
-Also, this project presents a server file written in C++ (```ur5_action_server.cpp```) that defines the client commands for UR5 arm movement, and the configuration files (CMake and XML) for the respective packages.
+Also, this project presents a server file written in C++ (```ur5_action_server.cpp```) that defines the client commands for UR5 arm movement, and the configuration files (CMake and XML) for the respective packages. The ```ur5_action_client.cpp``` is a client responsible for sending the commands to the action server.
 
 **Disclaimer**: This repository does not include the code for the robotic arm, the code used for the UR5 is available at: [**pla10/ros2_ur5_interface**](https://github.com/pla10/ros2_ur5_interface).
 
@@ -106,6 +111,10 @@ Also, this project presents a server file written in C++ (```ur5_action_server.c
 - **success:** Inform the user if the action was executed with success.
 
 - **duration_move:** Counts the time in nanoseconds (ns) for the arm to move from the starting position to the end position.
+
+- **duration_goal_move:** 
+
+- **command_delay:** 
 
 ### Feedback Structure
 
@@ -208,10 +217,10 @@ Initialize one of the hosts (docker container or other device), open one termina
 ros2 run custom_action_cpp ur5_action_server
 ```
 
-In another host, use the structure of the second command in ```command_start```, this will send a message as a client to the server. The available commands are described in the [features topic](#features).
+In another host, use the structure of the second command in ```command_start```, this will send a message as a client to the server. The available commands are described in the [features topic](#features). For sending a message as a client, use the ```ur5_action_client.cpp``` by building the package ```custom_action_client``` and using the following command on the terminal:
 
 ```
-ros2 action send_goal /ur5_move custom_action_interfaces/action/UR5 "execute: default"
+ros2 run custom_action_client ur5_action_client --ros-args -p "execute:=default"
 ```
 
 Then observate the move on RViz.
