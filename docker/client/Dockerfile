@@ -58,4 +58,4 @@ WORKDIR /ros2_ws/src/
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> /etc/bash.bashrc
 
 COPY ./custom_action_interface ./custom_action_interfaces/
-# custom_action_cpp is not necessary if this docker is used as a client only
+COPY /custom_action_client ./custom_action_client

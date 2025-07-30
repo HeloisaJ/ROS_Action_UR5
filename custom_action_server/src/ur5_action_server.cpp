@@ -14,7 +14,7 @@
 
 #include <control_msgs/msg/joint_trajectory_controller_state.hpp>
 
-namespace custom_action_cpp
+namespace custom_action_server
 {
     class UR5ActionServer : public rclcpp::Node
     {
@@ -147,6 +147,6 @@ namespace custom_action_cpp
 
     }; // class UR5ActionServer
 
-} // namespace custom_action_cpp
+} // namespace custom_action_server
 
-RCLCPP_COMPONENTS_REGISTER_NODE(custom_action_cpp::UR5ActionServer)
+RCLCPP_COMPONENTS_REGISTER_NODE(custom_action_server::UR5ActionServer)
