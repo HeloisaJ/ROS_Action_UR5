@@ -10,6 +10,7 @@ find_package(ament_cmake REQUIRED)
 find_package(custom_action_interfaces REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_action REQUIRED)
+find_package(rclcpp_components REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -24,7 +25,7 @@ if(BUILD_TESTING)
 endif()
 
 
-add_executable(action_client 
+add_library(action_client SHARED
   src/ur5_action_client.cpp)
 
 target_include_directories(action_client PRIVATE
@@ -37,9 +38,15 @@ target_compile_definitions(action_client
 ament_target_dependencies(action_client
   "custom_action_interfaces"
   "rclcpp"
-  "rclcpp_action")
+  "rclcpp_action"
+  "rclcpp_components")
+
+rclcpp_components_register_node(action_client PLUGIN "custom_action_client::UR5ActionClient" EXECUTABLE ur5_action_client)
 
 install(TARGETS
-  action_client DESTINATION lib/${PROJECT_NAME})
+  action_client
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION bin)
 
 ament_package()

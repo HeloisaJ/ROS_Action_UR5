@@ -9,7 +9,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
-//#include "rclcpp_components/register_node_macro.hpp"
+#include "rclcpp_components/register_node_macro.hpp"
 
 namespace custom_action_client
 {
@@ -22,18 +22,20 @@ namespace custom_action_client
         rclcpp::Time goal_sent;
         long int delay_client_server;
 
-        explicit UR5ActionClient(const std::string & goal, const rclcpp::NodeOptions & options): Node("ur5_action_client", options){
+        explicit UR5ActionClient(const rclcpp::NodeOptions & options): Node("ur5_action_client", options){
             this->client_ptr_ = rclcpp_action::create_client<UR5>(
             this,
             "ur5_move");
 
-            auto timer_callback_lambda = [this, goal](){ return this->send_goal(goal); };
+            this->declare_parameter<std::string>("execute", "default");
+
+            auto timer_callback_lambda = [this](){ return this->send_goal(); };
             this->timer_ = this->create_wall_timer(
             std::chrono::milliseconds(100),
             timer_callback_lambda);
         }
 
-        void send_goal(const std::string & goal){
+        void send_goal(){
             using namespace std::placeholders;
 
             this->timer_->cancel();
@@ -44,7 +46,7 @@ namespace custom_action_client
             }
 
             auto goal_msg = UR5::Goal();
-            goal_msg.execute = goal;
+            goal_msg.execute = this->get_parameter("execute").as_string();
 
             goal_sent = now();
             RCLCPP_INFO(this->get_logger(), "Sending goal");
@@ -102,14 +104,4 @@ namespace custom_action_client
     }; // class UR5ActionClient
 } // namespace custom_action_client
 
-int main(int argc, char** argv){
-
-    rclcpp::init(argc, argv);
-
-    std::string goal = argv[0];
-
-    auto client_ptr_ = std::make_shared<custom_action_client::UR5ActionClient>(goal, rclcpp::NodeOptions());
-    rclcpp::spin(client_ptr_);
-    rclcpp::shutdown();
-    return 0;
-}
+RCLCPP_COMPONENTS_REGISTER_NODE(custom_action_client::UR5ActionClient)
