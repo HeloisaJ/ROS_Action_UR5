@@ -9,9 +9,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
-#include "rclcpp_components/register_node_macro.hpp"
-
-#include "std_msgs/msg/float64.hpp"
+//#include "rclcpp_components/register_node_macro.hpp"
 
 namespace custom_action_client
 {
@@ -59,16 +57,11 @@ namespace custom_action_client
                 } 
                 else{
                     delay_client_server = (now() - goal_sent).nanoseconds();
-
-                    std::stringstream ss;
-                    ss << "Goal accepted by server";
-                    RCLCPP_INFO(this->get_logger(), ss.str().c_str());
+                    RCLCPP_INFO(this->get_logger(), "Goal accepted by server");
                 }
             };
 
-            send_goal_options.feedback_callback = [this](
-            GoalHandleUR5::SharedPtr,
-            const std::shared_ptr<const UR5::Feedback> feedback)
+            send_goal_options.feedback_callback = [this](GoalHandleUR5::SharedPtr, const std::shared_ptr<const UR5::Feedback> feedback)
             {
                 std::stringstream ss;
                 ss << "Status: " << feedback->status << "\n";
@@ -99,21 +92,24 @@ namespace custom_action_client
                 RCLCPP_INFO(this->get_logger(), ss.str().c_str());
                 rclcpp::shutdown();
             };
+
+            this->client_ptr_->async_send_goal(goal_msg, send_goal_options);
         }
 
         private:
-        rclcpp_action::Client<UR5>::SharedPtr client_ptr_;
-        rclcpp::TimerBase::SharedPtr timer_;
+            rclcpp_action::Client<UR5>::SharedPtr client_ptr_;
+            rclcpp::TimerBase::SharedPtr timer_;
     }; // class UR5ActionClient
 } // namespace custom_action_client
 
-int main(int argc, char * argv[]){
+int main(int argc, char** argv){
 
     rclcpp::init(argc, argv);
 
     std::string goal = argv[0];
 
-    rclcpp::spin(std::make_shared<custom_action_client::UR5ActionClient>(goal, rclcpp::NodeOptions{}));
+    auto client_ptr_ = std::make_shared<custom_action_client::UR5ActionClient>(goal, rclcpp::NodeOptions());
+    rclcpp::spin(client_ptr_);
     rclcpp::shutdown();
     return 0;
 }
