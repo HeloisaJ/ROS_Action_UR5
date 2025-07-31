@@ -16,5 +16,8 @@ points:
   - 0.0
   time_from_start: {sec: 2, nanosec: 0}"
 
-# Version with the action (working)
+# Version with the action send_goal (working)
 ros2 action send_goal /ur5_move custom_action_interfaces/action/UR5 "execute: default"
+
+# Version with client file and counting how much time it takes for sending a message from the client to the server
+ros2 run custom_action_client ur5_action_client --ros-args -p "execute:=pick_up
