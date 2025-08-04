@@ -10,6 +10,7 @@ This repository is an implementation of a ROS2 action for a Universal Robots 5 (
 - [Instructions for Available Docker Implementation](#instructions-for-available-docker-implementation)
 - [Instructions for Configuring the Packages Manually](#instructions-for-configuring-the-packages-manually)
 - [How to Initialize Client and Server Communication](#how-to-initialize-client-and-server-communication)
+- [How to Connect the srsUE to the Internet](#how-to-connect-the-srsue-to-the-internet)
 
 ---
 ## Prerequisites
@@ -238,3 +239,54 @@ ros2 run custom_action_client ur5_action_client --ros-args -p "execute:=default"
 ```
 
 Then observate the move on RViz.
+
+---
+## How to Connect the srsUE to the Internet
+
+Here are the steps for connecting a UE to the internet:
+
+- First, guarantee that IP fowarding are activated, you can change this in the configuration file ```/etc/sysctl.conf``` so it is always configured or use this on the terminal:
+
+```
+sudo sysctl -w net.ipv4.ip_forward=1
+sudo sysctl -w net.ipv6.conf.all.forwarding=1
+```
+
+- The configure the NAT rules using iptables:
+
+```
+sudo iptables -t nat -A POSTROUTING -s 10.45.0.0/16 ! -o ogstun -j MASQUERADE
+sudo ip6tables -t nat -A POSTROUTING -s 2001:db8:cafe::/48 ! -o ogstun -j MASQUERADE
+```
+
+- Activate the network core (Open5GS) and the gnb.
+
+- Generate a namespace for the UE:
+
+```
+sudo ip netns add ue1
+```
+
+- Activate the user equipment (UE) using a configuration file inside of the srsRAN 4G folder.
+
+```
+sudo ./srsue ./ue.conf
+```
+
+- Configure a route from the core to the UE:
+
+```
+sudo ip ro add 10.45.0.0/16 via 10.53.1.2
+```
+
+- Generate a default route for the UE:
+
+```
+sudo ip netns exec ue1 ip route add default via 10.45.1.1 dev tun_srsue
+```
+
+- Now you can start generating traffic from the UE to the internet:
+
+```
+sudo ip netns exec ue1 ping www.google.com
+```
